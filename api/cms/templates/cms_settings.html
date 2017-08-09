@@ -1,0 +1,62 @@
+{% extends 'cms_base.html' %}
+{% load static %}
+
+{% block title %}
+    个人设置
+{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'css/cms_setting.css' %}">
+    {% include 'common_qiniu_include.html' %}
+    <script src="{% static 'js/cms_settings.js' %}"></script>
+
+{% endblock %}
+
+{% block page_title %}
+    个人设置
+{% endblock %}
+
+{% block detail_with_title %}
+
+    <form action="" method="post" class="form form-horizontal form_middle">
+        {% csrf_token %}
+        <div class="form-group">
+            <div class="col-xs-3">
+                <label class="control-label">用户名</label>
+            </div>
+            <div class="col-xs-9">
+                <input type="text" name="username" value="{{ user.username }}" class="form-control">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-xs-3">
+                <label class="control-label">邮箱</label>
+            </div>
+            <div class="col-xs-9">
+                <div class="input-group">
+                    <input type="email" name="email" value="{{ user.email }}" class="form-control" readonly>
+                    <div class="input-group-btn">
+                        <a href="{% url 'cms_edit_email' %}" class="btn btn-success">修改邮箱</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-xs-3">
+                <label class="control-label">头像</label>
+            </div>
+            <div class="col-xs-9">
+                {% if not cms_user.avatar %}
+                    <img class="avatar_img img-circle" id="upload_btn" src="{% static 'images/2.jpg' %}" alt="">
+                {% else %}
+                    <img class="avatar_img img-circle" id="upload_btn" src="{{ cms_user.avatar }}" alt="">
+                {% endif %}
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-xs-offset-3 col-xs-3">
+                <button type="submit" class="btn btn-primary" id="submit_btn">保存修改</button>
+            </div>
+        </div>
+    </form>
+{% endblock %}

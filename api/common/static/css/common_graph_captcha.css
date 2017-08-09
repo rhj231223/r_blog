@@ -1,0 +1,12 @@
+.addon_style{
+    padding:0;
+}
+
+.addon_style>img{
+    width:80px;
+    height:30px;
+}
+
+.addon_style:hover{
+    cursor:pointer;
+}
