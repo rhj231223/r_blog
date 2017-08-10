@@ -28,3 +28,16 @@ class EditEmailForm(SendEmailForm):
             self.add_error('email_captcha',u'邮件验证码错误!')
         else:
             return self.cleaned_data
+
+class AddCategoryForm(BaseForm):
+    category_name=forms.CharField(30)
+
+class AddTagForm(BaseForm):
+    tag_name=forms.CharField(30)
+
+class AddArticleForm(BaseForm):
+    title=forms.CharField(max_length=100)
+    category_id=forms.IntegerField()
+    desc=forms.CharField(required=False)
+    thumbnail=forms.URLField(max_length=200,required=False)
+    content_html=forms.CharField()

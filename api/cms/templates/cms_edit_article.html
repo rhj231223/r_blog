@@ -1,0 +1,27 @@
+{% extends 'cms_edit_article_base.html' %}
+
+{% block title %}
+    编辑文章
+{% endblock %}
+
+{% block head %}
+    {{ block.super }}
+{% endblock %}
+
+{% block page_title %}
+    编辑文章
+{% endblock %}
+
+{% block submit_btn %}
+    编辑文章
+{% endblock %}
+
+{% block title_value %}{{ article.title }}{% endblock %}
+
+{% block desc_value %}{{ article.desc }}{% endblock %}
+
+{% block thumbnail_value %}{{ article.thumbnail }}{% endblock %}
+
+{% block content_value %}
+    {{ article.content_html }}
+{% endblock %}

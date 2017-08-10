@@ -1,0 +1,94 @@
+{% extends 'cms_base.html' %}
+{% load static %}
+
+{% block title %}
+    添加文章
+{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'simditor-2.3.6/styles/simditor.css' %}">
+    <link rel="stylesheet" href="{% static 'css/cms_edit_article_base.css' %}">
+    {% include 'common_qiniu_include.html' %}
+    {% include 'common_simditor_include.html' %}
+    {% include 'cms_tag_template.html' %}
+    <script src="{% static 'js/arttemplate.js' %}"></script>
+    <script src="{% static 'js/xttemplate.js' %}"></script>
+    <script src="{% static 'js/cms_edit_article_base.js' %}"></script>
+
+{% endblock %}
+
+
+
+{% block detail_with_title %}
+    <form action="" class="form form-horizontal" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <div class="input-group">
+                <span class="input-group-addon">标题</span>
+                <input type="text" name="title" value="{% block title_value %}{% endblock %}"
+                       class="form-control" placeholder="标题">
+                <div class="input-group-btn">
+                    <button class="btn btn-danger" id="submit_btn" data_article_id="{{ article.id }}">{% block submit_btn %}{% endblock %}</button>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="input-group">
+                <span class="input-group-addon">分类</span>
+                <select name="category_id" class="form-control">
+                    {% for category in categorys %}
+                        {% if current_category.id == category.id %}
+                            <option value="{{ category.id }}" selected>{{ category.name }}</option>
+                        {% else %}
+                            <option value="{{ category.id }}">{{ category.name }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+                <div class="input-group-btn">
+                    <button class="btn btn-default" id="category_btn">添加分类</button>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="input-group">
+                <span class="input-group-addon">描述</span>
+                <input type="text" name="desc" value="{% block desc_value %}{% endblock %}"
+                       class="form-control" placeholder="描述">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="input-group">
+                <span class="input-group-addon">图片</span>
+                <input type="text" name="thumbnail" value="{% block thumbnail_value %}{% endblock %}" class="form-control" placeholder="缩略图地址">
+                <div class="input-group-btn">
+                    <button class="btn btn-default" id="thumbnail_btn">上传图片</button>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="input-group">
+                <span class="input-group-addon">标签</span>
+                <div class="form-control" id="tag_list">
+                    {% for tag in tags %}
+                        <label for="" class="checkbox-inline">
+                            {% if tag.id in current_tag_ids %}
+                                <input type="checkbox" name="tags" value="{{ tag.id }}" checked>{{ tag.name }}
+                            {% else %}
+                                <input type="checkbox" name="tags" value="{{ tag.id }}">{{ tag.name }}
+                            {% endif %}
+                        </label>
+                    {% endfor %}
+                </div>
+                <div class="input-group-btn">
+                    <button class="btn btn-default" id="tag_btn">添加标签</button>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <textarea name="content_html" id="content_html" cols="30" rows="10">
+                {% block content_value %}{% endblock %}
+            </textarea>
+        </div>
+
+    </form>
+{% endblock %}

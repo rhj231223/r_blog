@@ -6,10 +6,13 @@ from django.contrib.auth import authenticate,login,logout
 from django.http import HttpResponse
 from django.views.decorators.http import require_http_methods
 from forms import LoginForm,SettingsForm,\
-    SendEmailForm,EditEmailForm
+    SendEmailForm,EditEmailForm,AddCategoryForm,\
+    AddTagForm,AddArticleForm
 from utils import xtjson
 from cms_auth.models import CMSUserModel
 from utils.xtmail import send_mail
+from article.models import ArticleModel,\
+CategoryModel,TagModel
 # Create your views here.
 
 @login_required
@@ -55,10 +58,8 @@ def cms_logout(request):
 @login_required
 @require_http_methods(['GET','POST'])
 def settings(request):
-    cms_user=CMSUserModel.objects.filter(user_id=request.user.id).first()
     if request.method=='GET':
-        context=dict(cms_user=cms_user)
-        return render(request,'cms_settings.html',context=context)
+        return render(request,'cms_settings.html')
     else:
         form=SettingsForm(request.POST)
         if form.is_valid():
@@ -66,6 +67,7 @@ def settings(request):
             avatar=form.cleaned_data.get('avatar')
 
             user=request.user
+            cms_user=request.cms_user
             if cms_user:
                 cms_user.avatar=avatar
                 cms_user.save()
@@ -107,5 +109,124 @@ def captcha_email(request):
             return xtjson.json_result()
         else:
             return xtjson.json_params_error(message=u'邮件发送失败,请检查邮箱填写是否有误')
+    else:
+        return form.get_error_response()
+
+
+@login_required
+@require_http_methods(['GET','POST'])
+def add_article(request):
+    if request.method=='GET':
+        categorys=CategoryModel.objects.all()
+        tags=TagModel.objects.all()
+        context=dict(categorys=categorys,tags=tags)
+        return render(request,'cms_add_article.html',context=context)
+    else:
+        form=AddArticleForm(request.POST)
+        if form.is_valid():
+            title=form.cleaned_data.get('title')
+            category_id=form.cleaned_data.get('category_id')
+            desc=form.cleaned_data.get('desc')
+            thumbnail=form.cleaned_data.get('thumbnail')
+            content_html=form.cleaned_data.get('content_html')
+            tags=request.POST.getlist('tags[]')
+
+            category=CategoryModel.objects.filter(id=category_id).first()
+            article=ArticleModel(title=title,desc=desc,content_html=content_html)
+
+            if desc:
+                article.desc=desc
+            if thumbnail:
+                article.thumbnail=thumbnail
+
+            article.category = category
+            article.author = request.user
+
+            article.save()
+            if tags:
+                for tag_id in tags:
+                    tag=TagModel.objects.filter(id=tag_id).first()
+                    article.tags.add(tag)
+            return xtjson.json_result()
+
+        else:
+            return form.get_error_response()
+
+@login_required
+@require_http_methods(['GET','POST'])
+def edit_article(request,article_id):
+    article = ArticleModel.objects.filter(id=article_id).first()
+    if request.method=='GET':
+        categorys=CategoryModel.objects.all()
+        tags=TagModel.objects.all()
+        current_category=article.category
+        current_tag_ids=[tag.id for tag in article.tags.all()]
+        context=dict(article=article,categorys=categorys,tags=tags,
+                     current_category=current_category,
+                     current_tag_ids=current_tag_ids)
+        return render(request,'cms_edit_article.html',context=context)
+    else:
+        form=AddArticleForm(request.POST)
+        if form.is_valid():
+            if article:
+                # title=form.cleaned_data.get('title')
+                # desc=form.cleaned_data.get('desc')
+                # thumbnail=form.cleaned_data.get('thumbnail')
+                # content_html=form.cleaned_data.get('content_html')
+                category_id=form.cleaned_data.get('category_id')
+                tags=request.POST.getlist('tags[]')
+
+                for k,v in form.cleaned_data.iteritems():
+                    if k!='category_id':
+                        setattr(article,k,v)
+
+                category=CategoryModel.objects.filter(id=category_id).first()
+                article.category=category
+                article.save()
+
+                if tags:
+                    article.tags.set([])
+                    for tag_id in tags:
+                        tag=TagModel.objects.filter(id=tag_id).first()
+                        article.tags.add(tag)
+                return xtjson.json_result()
+
+
+            else:
+                return xtjson.json_params_error(message=u'没有找到该文章!')
+        else:
+            return form.get_error_response()
+
+
+@login_required
+@require_http_methods(['POST'])
+def add_category(request):
+    form=AddCategoryForm(request.POST)
+    if form.is_valid():
+        category_name=form.cleaned_data.get('category_name')
+        db_category=CategoryModel.objects.filter(name=category_name).first()
+        if not db_category:
+            category=CategoryModel(name=category_name)
+            category.save()
+            return xtjson.json_result(data=dict(id=category.id,name=category.name))
+        else:
+            return xtjson.json_params_error(message=u'已经有同名的分类了,无需添加!')
+    else:
+        return form.get_error_response()
+
+@login_required
+@require_http_methods(['POST'])
+def add_tag(request):
+    form=AddTagForm(request.POST)
+    if form.is_valid():
+        tag_name=form.cleaned_data.get('tag_name')
+        db_tag=TagModel.objects.filter(name=tag_name).first()
+        if not db_tag:
+            tag=TagModel(name=tag_name)
+            tag.save()
+            return xtjson.json_result(data=dict(id=tag.id,name=tag.name))
+        else:
+            return xtjson.json_params_error(message=u'已经有同名的标签了,无需添加!')
+
     else:
         return form.get_error_response()

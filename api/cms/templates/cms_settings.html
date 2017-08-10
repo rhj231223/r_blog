@@ -47,9 +47,9 @@
             </div>
             <div class="col-xs-9">
                 {% if not cms_user.avatar %}
-                    <img class="avatar_img img-circle" id="upload_btn" src="{% static 'images/2.jpg' %}" alt="">
+                    <img class="avatar_img img-circle" id="upload_btn" src="{% static 'images/2.jpg' %}" alt="请按f5刷新">
                 {% else %}
-                    <img class="avatar_img img-circle" id="upload_btn" src="{{ cms_user.avatar }}" alt="">
+                    <img class="avatar_img img-circle" id="upload_btn" src="{{ cms_user.avatar }}" alt="请按f5刷新">
                 {% endif %}
             </div>
         </div>
