@@ -155,7 +155,7 @@ QINIU_SECRET_KEY='hU8FUVpl-UWMfjIVsy5bNjDh22jMbAlUXc_WdpB7'
 
 BUCKET_NAME='rblog'
 
-#邮件设置
+#邮件配置置
 EMAIL_HOST_USER='657930342@qq.com'
 EMAIL_HOST_PASSWORD='hggiofvfzgygbddb'
 
@@ -163,3 +163,7 @@ EMAIL_HOST='smtp.qq.com'
 EMAIL_PORT='587'
 
 EMAIL_USE_TLS=True
+
+#分页配置
+SINGLE_PAGE_NUM=15 #每页显示的文章数量
+SHOW_PAGE=5         #每页显示的分页数量

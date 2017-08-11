@@ -7,18 +7,39 @@ from django.http import HttpResponse
 from django.views.decorators.http import require_http_methods
 from forms import LoginForm,SettingsForm,\
     SendEmailForm,EditEmailForm,AddCategoryForm,\
-    AddTagForm,AddArticleForm
+    AddTagForm,AddArticleForm,TopArticleForm,\
+    DeleteArticleForm,EditCategoryForm,DeleteCategoryForm
 from utils import xtjson
 from cms_auth.models import CMSUserModel
 from utils.xtmail import send_mail
 from article.models import ArticleModel,\
-CategoryModel,TagModel
+CategoryModel,TagModel,TopModel
+from utils.pagination import pagination
+from r_blog.settings import SINGLE_PAGE_NUM,SHOW_PAGE
+from django.db.models import Count
 # Create your views here.
 
 @login_required
 @require_http_methods(['GET'])
 def index(request):
-    return render(request,'cms_base.html')
+    return article_manage(request,page=1,category_id=0)
+
+@login_required
+@require_http_methods(['GET'])
+def article_manage(request,page=1,category_id=0):
+    page=int(page)
+    category_id=int(category_id)
+    articles=ArticleModel.objects.order_by('-create_time').all()
+    categorys=CategoryModel.objects.all()
+
+    if category_id!=0:
+        articles=articles.filter(category_id=category_id)
+
+    total_page,start,end,page_list=pagination(page,articles.count(),SINGLE_PAGE_NUM,SHOW_PAGE)
+    context=dict(articles=articles[start:end],categorys=categorys,
+                 current_page=page,current_category_id=category_id,
+                 total_page=total_page,page_list=page_list)
+    return render(request,'cms_article_manage.html',context=context)
 
 @require_http_methods(['GET','POST'])
 def cms_login(request):
@@ -230,3 +251,135 @@ def add_tag(request):
 
     else:
         return form.get_error_response()
+
+@login_required
+@require_http_methods(['POST'])
+def top_article(request):
+    form=TopArticleForm(request.POST)
+    if form.is_valid():
+        article_id=form.cleaned_data.get('article_id')
+        is_top=form.cleaned_data.get('is_top')
+
+        if not article_id:
+            return xtjson.json_params_error(message=u'请指定文章id!')
+        else:
+            article=ArticleModel.objects.filter(id=article_id).first()
+            if not article:
+                return xtjson.json_params_error(message=u'该文章不存在!')
+            else:
+                if not article.top:
+                    if is_top==1:
+                        top=TopModel()
+                        top.save()
+                        article.top=top
+                        article.save(update_fields=['top'])
+                        return xtjson.json_result()
+                    else:
+                        return xtjson.json_params_error(message=u'该文章已置顶,无需重复置顶!')
+                else:
+                    if is_top==0:
+                        article.top.delete()
+
+                        return xtjson.json_result()
+                    else:
+                        return xtjson.json_params_error(message=u'该文章没有置顶，无需取消置顶')
+    else:
+        return form.get_error_response()
+
+@login_required
+@require_http_methods(['POST'])
+def delete_article(request):
+    form=DeleteArticleForm(request.POST)
+    if form.is_valid():
+        article_id=form.cleaned_data.get('article_id')
+        is_remove=form.cleaned_data.get('is_remove')
+        if not article_id:
+            return xtjson.json_params_error(message=u'必须指定文章ID!')
+        else:
+            article=ArticleModel.objects.filter(id=article_id).first()
+            if not article:
+                return xtjson.json_params_error(message=u'没有找到该文章!')
+            else:
+                if not article.is_remove:
+                    if is_remove==1:
+                        article.is_remove=1
+                        article.save()
+                        return xtjson.json_result()
+                    else:
+                        return xtjson.json_params_error(message=u'该文章没有被删除,无需取消删除!')
+                else:
+                    if is_remove==0:
+                        article.is_remove=0
+                        article.save()
+                        return xtjson.json_result()
+                    else:
+                        return xtjson.json_params_error(message=u'该文章已被删除，无需重复删除!')
+    else:
+        return form.get_error_response()
+
+@login_required
+@require_http_methods(['GET'])
+def category_manage(request):
+    categorys=CategoryModel.objects.annotate(article_counts=Count('articlemodel')).order_by('-article_counts').all()
+    context=dict(categorys=categorys)
+    return render(request,'cms_category_manage.html',context=context)
+
+@login_required
+@require_http_methods(['POST'])
+def edit_category(request):
+    form=EditCategoryForm(request.POST)
+    if form.is_valid():
+        category_id=form.cleaned_data.get('category_id')
+        category_name=form.cleaned_data.get('category_name')
+        if not category_id:
+            return xtjson.json_params_error(message=u'请指定分类ID')
+        else:
+            category=CategoryModel.objects.filter(id=category_id).first()
+            if not category:
+                return xtjson.json_params_error(u'没有找到该文章!')
+            else:
+                db_category=CategoryModel.objects.filter(name=category_name).first()
+                if db_category and db_category!=category:
+                    return xtjson.json_params_error(message=u'已经有同名的分类了!')
+                else:
+                    category.name=category_name
+                    category.save()
+                    return xtjson.json_result()
+    else:
+        return form.get_error_response()
+
+@login_required
+@require_http_methods(['POST'])
+def delete_category(request):
+    form=DeleteCategoryForm(request.POST)
+    if form.is_valid():
+        category_id=form.cleaned_data.get('category_id')
+        if not category_id:
+            return xtjson.json_params_error(message=u'必须指定分类ID')
+        else:
+            category=CategoryModel.objects.filter(id=category_id).first()
+            if not category:
+                return xtjson.json_params_error(message=u'没有找到该文章!')
+            elif category.articlemodel_set.count():
+                return xtjson.json_params_error(message=u'该分类下还有文章,不能删除!')
+            else:
+                category.delete()
+                return xtjson.json_result()
+    else:
+        return form.get_error_response()
+
+def test(request):
+    category=CategoryModel.objects.first()
+    author=User.objects.first()
+    tags=TagModel.objects.all()[1:4]
+
+    for i in xrange(100):
+        title='标题 %s' %i
+        content_html='内容 %s' %i
+
+        article=ArticleModel(title=title,content_html=content_html)
+        article.category=category
+        article.author=author
+        article.save()
+        article.tags.set(tags)
+    return HttpResponse('success')

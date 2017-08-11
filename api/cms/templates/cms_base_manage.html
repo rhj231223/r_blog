@@ -1,0 +1,28 @@
+{% extends 'cms_base.html' %}
+{% load static %}
+
+{% block title %}
+    博客管理
+{% endblock %}
+
+{% block head %}
+    <script src="{% static 'js/cms_base_manage.js' %}"></script>
+{% endblock %}
+
+{% block page_title %}
+    博客管理
+{% endblock %}
+
+{% block detail_with_title %}
+
+    <ul class="nav nav-tabs nav_style">
+        <li><a href="{% url 'cms_index' %}">文章管理</a></li>
+        <li><a href="{% url 'cms_category_manage' %}">分类管理</a></li>
+        <li><a href="">评论管理</a></li>
+    </ul>
+    
+    {% block manage_detail %}
+    
+    {% endblock %}
+    
+{% endblock %}

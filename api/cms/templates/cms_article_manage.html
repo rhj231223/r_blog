@@ -1,0 +1,102 @@
+{% extends 'cms_base_manage.html' %}
+{% load static %}
+
+{% block title %}
+    博客管理-文章管理
+{% endblock %}
+
+
+{% block head %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/cms_article_manage.css' %}">
+    <script src="{% static 'js/cms_article_manage.js' %}"></script>
+{% endblock %}
+
+
+{% block manage_detail %}
+    {% csrf_token %}
+    <div class="input-group col-xs-8 select_style">
+        <span class="input-group-addon">按类型</span>
+        <select name="category" class="form-control">
+            <option value="0" {% if current_category_id == 0 %}selected{% endif %}>全部</option>
+
+            {% for category in categorys %}
+                <option value="{{ category.id }}" {% if current_category_id == category.id %}selected{% endif %}>{{ category.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+
+    <table class="table table-striped table-bordered pad_top_24">
+        <thead>
+            <tr>
+                <th>标题</th>
+                <th>发表时间</th>
+                <th>分类</th>
+                <th>阅读量</th>
+                <th>评论量</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for article in articles %}
+                <tr>
+                    {% if article.top %}
+                        <td><a href="">{{ article.title }}</a>
+                            <span class="label label-danger">置顶</span>
+                        </td>
+                    {% else %}
+                        <td><a href="">{{ article.title }}</a></td>
+                    {% endif %}
+                    <td>{{ article.create_time|date:'Y-m-d H:i:s' }}</td>
+                    <td>{{ article.category.name }}</td>
+                    <td>{{ article.read_count }}</td>
+                    <td>暂未实现</td>
+                    <td>
+                        <a href="{% url 'cms_edit_article' article_id=article.id %}" class="btn btn-warning btn-xs edit_btn" data_article_id="{{ article.id }}">编辑</a>
+                        {% if not article.top %}
+                            <button class="btn btn-info btn-xs top_btn"
+                                    data_article_id="{{ article.id }}" data_is_top="1">置顶</button>
+                        {% else %}
+                            <button class="btn btn-primary btn-xs top_btn"
+                                    data_article_id="{{ article.id }}" data_is_top="0">取消置顶</button>
+                        {% endif %}
+
+                        {% if not article.is_remove %}
+                            <button class="btn btn-danger btn-xs delete_btn" data_article_id="{{ article.id }}"
+                            data_is_remove="1">删除</button>
+                        {% else %}
+                            <button class="btn btn-success btn-xs delete_btn" data_article_id="{{ article.id }}"
+                            data_is_remove="0">取消删除</button>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="pagenation">
+        <ul class="pagination">
+            {% if current_page > 1 %}
+                <li><a href="{% url 'cms_article_manage' category_id=current_category_id page=current_page|add:-1 %}">&laquo;</a></li>
+            {% else %}
+                <li><span>&laquo;</span></li>
+            {% endif %}
+
+            {% for page in page_list %}
+                {% if current_page == page %}
+                    <li class="active"><a href="{% url 'cms_article_manage' page=page category_id=current_category_id %}">{{ page }}</a></li>
+                {% else %}
+                    <li><a href="{% url 'cms_article_manage' page=page category_id=current_category_id %}">{{ page }}</a></li>
+                {% endif %}
+            {% endfor %}
+
+             {% if current_page < total_page %}
+                <li><a href="{% url 'cms_article_manage' category_id=current_category_id page=current_page|add:1 %}">&raquo;</a></li>
+            {% else %}
+                <li><span>&raquo;</span></li>
+            {% endif %}
+        </ul>
+    </div>
+
+{% endblock %}

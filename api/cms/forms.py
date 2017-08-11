@@ -41,3 +41,19 @@ class AddArticleForm(BaseForm):
     desc=forms.CharField(required=False)
     thumbnail=forms.URLField(max_length=200,required=False)
     content_html=forms.CharField()
+
+class TopArticleForm(BaseForm):
+    article_id=forms.CharField(max_length=100)
+    is_top=forms.IntegerField()
+
+class DeleteArticleForm(BaseForm):
+    article_id = forms.CharField(max_length=100)
+    is_remove=forms.IntegerField()
+
+class DeleteCategoryForm(BaseForm):
+    category_id=forms.IntegerField()
+
+
+class EditCategoryForm(DeleteCategoryForm):
+    category_name=forms.CharField(max_length=30)
+

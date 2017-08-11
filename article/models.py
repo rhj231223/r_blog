@@ -19,7 +19,7 @@ class ArticleModel(models.Model):
     author=models.ForeignKey(User)
     category=models.ForeignKey('CategoryModel')
     tags=models.ManyToManyField('TagModel')
-
+    top=models.OneToOneField('TopModel',null=True,on_delete=models.SET_NULL)
 
 
 class CategoryModel(models.Model):
@@ -28,3 +28,5 @@ class CategoryModel(models.Model):
 class TagModel(models.Model):
     name=models.CharField(max_length=30,unique=True)
 
+class TopModel(models.Model):
+    create_time=models.DateTimeField(auto_now_add=True)

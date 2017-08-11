@@ -1,0 +1,38 @@
+{% extends 'cms_base_manage.html' %}
+{% load static %}
+
+{% block title %}
+    博客管理-分类管理
+{% endblock %}
+
+{% block head %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/cms_category_manage.css' %}">
+    <script src='{% static 'js/cms_category_manage.js' %}'></script>
+{% endblock %}
+
+{% block manage_detail %}
+    <table class="table table-striped table-bordered table_style">
+        {% csrf_token %}
+        <thead>
+            <tr>
+                <th>分类名称</th>
+                <th>文章数量</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for category in categorys %}
+                <tr>
+                    <td>{{ category.name }}</td>
+                    <td>{{ category.articlemodel_set.all.count }}</td>
+                    <td>
+                        <button class="btn btn-warning btn-xs edit_btn" data_category_id="{{ category.id }}" data_category_name="{{ category.name }}">编辑</button>
+                        <button class="btn btn-danger btn-xs delete_btn" data_category_id="{{ category.id }}" data_category_name="{{ category.name }}">删除</button>
+                    </td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+{% endblock %}

@@ -1,0 +1,11 @@
+.select_style{
+    padding:24px 0;
+}
+
+.pagenation{
+    text-align: center;
+}
+
+table tr td:nth-of-type(1){
+    width:40%;
+}
