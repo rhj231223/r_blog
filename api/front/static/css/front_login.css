@@ -1,0 +1,10 @@
+.checkbox{
+    float:left;
+}
+
+.forget_pwd{
+    float:right;
+}
+.form-horizontal .checkbox{
+    padding-top:0;
+}

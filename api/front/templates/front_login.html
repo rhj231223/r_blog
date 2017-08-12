@@ -1,0 +1,24 @@
+{% extends 'front_sign_base.html' %}
+{% load static %}
+
+{% block title %}
+    博客-登录
+{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'css/front_login.css' %}">
+{% endblock %}
+
+{% block form_footer %}
+    <div class="form-group">
+        <button class="btn btn-primary btn-block" id="login_btn">登录</button>
+    </div>
+    <div class="checkbox">
+        <label for="">
+            <input type="checkbox" name="remember" value="1">记住我
+        </label>
+    </div>
+    <div class="forget_pwd">
+        <a href="">忘记密码?</a>
+    </div>
+{% endblock %}

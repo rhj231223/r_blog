@@ -29,7 +29,7 @@ def index(request):
 def article_manage(request,page=1,category_id=0):
     page=int(page)
     category_id=int(category_id)
-    articles=ArticleModel.objects.order_by('-create_time').all()
+    articles=ArticleModel.objects.order_by('-top__create_time','-create_time').all()
     categorys=CategoryModel.objects.all()
 
     if category_id!=0:
@@ -71,7 +71,7 @@ def cms_login(request):
             context=dict(message=form.errors.as_text())
         return render(request,'cms_login.html',context=context)
 
-@login_required
+
 def cms_logout(request):
     logout(request)
     return redirect(reverse('cms_login'))
@@ -268,14 +268,17 @@ def top_article(request):
                 return xtjson.json_params_error(message=u'该文章不存在!')
             else:
                 if not article.top:
-                    if is_top==1:
-                        top=TopModel()
-                        top.save()
-                        article.top=top
-                        article.save(update_fields=['top'])
-                        return xtjson.json_result()
+                    if article.thumbnail:
+                        if is_top==1:
+                            top=TopModel()
+                            top.save()
+                            article.top=top
+                            article.save(update_fields=['top'])
+                            return xtjson.json_result()
+                        else:
+                            return xtjson.json_params_error(message=u'该文章已置顶,无需重复置顶!')
                     else:
-                        return xtjson.json_params_error(message=u'该文章已置顶,无需重复置顶!')
+                        return xtjson.json_params_error(message=u'置顶的文章必须有缩略图!')
                 else:
                     if is_top==0:
                         article.top.delete()

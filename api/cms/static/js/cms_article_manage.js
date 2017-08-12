@@ -6,7 +6,7 @@
 $(function(){
     var select=$('select[name=category]');
     select.change(function(){
-        value=$(this).val();
+        var value=$(this).val();
 
         window.location='/cms/article_manage/1/'+value+'/';
     })
@@ -22,9 +22,6 @@ $(function(){
         var is_top=$(this).attr('data_is_top');
         var category_id=$('select[name=category]').val();
 
-        console.log(article_id);
-        console.log(is_top);
-
         rhjajax.post({
             url:'/cms/top_article/',
             data:{
@@ -32,7 +29,7 @@ $(function(){
                 is_top:is_top,
             },
             success:function(data){
-                if(data['code']=200){
+                if(data['code']==200){
                     var msg='';
                     if(is_top='1'){
                         msg='置顶操作成功!';

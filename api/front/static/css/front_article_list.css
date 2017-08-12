@@ -1,0 +1,34 @@
+.article_box{
+    width:960px;
+    margin:0 auto;
+}
+
+.thumbnail_box{
+    height:320px;
+}
+
+.article_info{
+    text-align: right;
+}
+
+.thumbnail_box img{
+    height:200px;
+}
+
+.btn_box{
+    text-align: center;
+}
+
+#load_btn{
+    max-width:400px;
+    min-width:60%;
+    margin:0 auto;
+}
+
+.wrap_box:nth-of-type(3n-2){
+    padding-left:0;
+}
+
+.wrap_box:nth-of-type(3n){
+    padding-right:0;
+}

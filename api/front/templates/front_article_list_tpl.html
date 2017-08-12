@@ -1,0 +1,23 @@
+<script type="text/html" id="article_list_tpl">
+    {% verbatim %}
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <a href="">{{ article.title }}</a>
+                </div>
+                <div class="panel-body">
+                    {{ if article.desc }}
+                        <div class="article_content">{{ article.desc}}</div>
+                    {{ else }}
+                        <div class="article_content">{{ article.content_html }}</div>
+                    {{ /if }}
+                    <div class="article_info">
+                        <span>阅读: {{ article.read_count }}</span>
+                        <span>评论: 10</span>
+                        <span>{{ article.create_time | dateFormat:'yyyy-MM-dd hh:mm' }}</span>
+                    </div>
+                </div>
+            </div>
+
+    {% endverbatim %}
+</script>

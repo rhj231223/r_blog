@@ -123,7 +123,7 @@ CACHES={
     },
 }
 
-SESSION_ENGINE='django.contrib.sessions.backends.cached_db'
+SESSION_ENGINE='django.contrib.sessions.backends.db'
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
