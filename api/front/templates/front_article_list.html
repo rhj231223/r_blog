@@ -29,13 +29,15 @@
             {% for article in top_articles %}
             <div class="col-xs-4 wrap_box">
                 <div class="thumbnail thumbnail_box">
-                    <img src="{{ article.thumbnail }}" alt="">
+                    <a href="{% url 'front_article_detail' article_id=article.id %}">
+                        <img src="{{ article.thumbnail }}" alt="">
+                    </a>
                     <div class="caption">
-                        <h4><a href="{% url 'front_article_detail' article_id=article.id %}">{{ article.title|truncatechars_html:30 }}</a></h4>
+                        <h4><a href="{% url 'front_article_detail' article_id=article.id %}">{{ article.title|truncatechars_html:15 }}</a></h4>
                         {% if article.desc %}
                             <p>{{ article.desc }}</p>
                         {% else %}
-                            <p>{{ article.content_html|truncatechars_html:30|striptags }}</p>
+                            <p>{{ article.content_html|truncatechars_html:20|striptags }}</p>
                         {% endif %}
                     </div>
                 </div>
@@ -44,6 +46,9 @@
        </div>
 
         <div class="row" id="main_article">
+            {% if query %}
+                <h3 class="query_title">关于 <span class="query">{{ query }}</span> 的搜索结果 <span class="query">{{ articles|length }}</span> 条</h3>
+            {% endif %}
             {% for article in articles %}
                 <div class="panel panel-default">
                     <div class="panel-heading">

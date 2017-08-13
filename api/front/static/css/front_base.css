@@ -1,0 +1,11 @@
+#down1{
+    color:#aaa;
+    background:transparent;
+    border:none;
+    height:50px;
+    line-height: 50px;
+}
+
+#down1:hover{
+    color:#fff;
+}

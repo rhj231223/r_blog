@@ -9,7 +9,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     {% include 'common_include.html' %}
     <link rel="stylesheet" href="{%  static 'css/dashboard.css' %}">
-    
+    <link rel="stylesheet" href="{%  static 'css/front_base.css' %}">
+
     {% block head %}
     
     {% endblock %}
@@ -34,12 +35,18 @@
                 <li><a href="{% url 'front_login' %}">登录</a></li>
                 <li><a href="{% url 'front_regist' %}">注册</a></li>
             {% else %}
-                <li><a href="">{{ front_user.username }}</a></li>
+                <li class="dropdown">
+                    <button class="dropdown-toggle" data-toggle="dropdown" id="down1"
+                    aria-expanded="true" aria-haspopup="true">{{ front_user.username }}</button>
+                    <ul class="dropdown-menu" aria-labelledby="down1">
+                        <li><a href="{% url 'front_logout' %}">退出</a></li>
+                    </ul>
+                </li>
             {% endif %}
 
           </ul>
-          <form class="navbar-form navbar-right">
-            <input type="text" class="form-control" placeholder="Search...">
+          <form action="{% url 'front_article_list' category_id=0 page=1 %}" class="navbar-form navbar-right" method="get">
+            <input type="text" name="query" class="form-control" placeholder="搜索...">
           </form>
         </div>
       </div>

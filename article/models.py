@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from django.db import models
 from uuid import uuid4
 from django.contrib.auth.models import User
+from front_auth.models import FrontUserModel
 
 # Create your models here.
 class ArticleModel(models.Model):
@@ -30,3 +31,12 @@ class TagModel(models.Model):
 
 class TopModel(models.Model):
     create_time=models.DateTimeField(auto_now_add=True)
+
+class CommentModel(models.Model):
+    content=models.CharField(max_length=200)
+    create_time=models.DateTimeField(auto_now_add=True)
+    update_time=models.DateTimeField(auto_now=True)
+
+    article=models.ForeignKey('ArticleModel')
+    author=models.ForeignKey(FrontUserModel)
+

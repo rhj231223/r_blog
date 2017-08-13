@@ -56,6 +56,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'api.cms.middlewares.avatar_middleware',
+    'front_auth.middlewares.front_user_middleware',
 ]
 
 ROOT_URLCONF = 'r_blog.urls'
@@ -73,6 +74,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'api.cms.context_processors.avatar_context_processor',
+                'front_auth.context_processors.front_user_context_processor',
             ],
         },
     },

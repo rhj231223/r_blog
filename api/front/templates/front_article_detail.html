@@ -7,11 +7,13 @@
 
 {% block head %}
     <link rel="stylesheet" href="{% static 'css/front_article_detail.css' %}">
+    <script src="{% static 'js/front_article_detail.js' %}"></script>
 {% endblock %}
 
 
 {% block main %}
     <div class="main_box">
+        {% csrf_token %}
         <h2>{{ article.title }}</h2>
         <div class="article_info">
             <span>发表时间: {{ article.create_time|date:'Y-m-d H:i' }}</span>
@@ -27,21 +29,38 @@
             <p>{{ article.content_html|safe }}</p>
         </div>
 
-        <h4>评论</h4>
+        <h4>评论 ({{ comments.count }})</h4>
         <hr>
-        <div class="media comment">
-            <div class="media-left">
-                <img src="" alt="" class="media-object img-circle">
+        {% for comment in comments %}
+            <div class="media comment">
+                <div class="media-left media_left_box">
+                    {% if comment.author.avatar %}
+                        <img src="{{ comment.author.avatar }}" alt="" class="media-object img-circle avatar_style">
+                    {% else %}
+                        <img src="{% static 'images/2.jpg' %}" alt="" class="media-object img-circle avatar_style">
+                    {% endif %}
+                </div>
+                <div class="media-body media_body_box">
+                    <div class="front_user_info">
+                        <span>{{ comment.author.username }}</span>
+                        <span>{{ comment.create_time|date:'Y年m月d日 H:i' }}</span>
+                    </div>
+                    <p>{{ comment.content }}</p>
+                    {% if not front_user %}
+                        <a class="btn btn-warning btn-sm" href="{% url 'front_login' %}"></a>
+                    {% elif comment.author.id == front_user.id %}
+                        <a href="{% url 'front_article_detail' article_id=article.id %}?comment_id={{ comment.id }}#footer" class="btn btn-warning btn-xs edit_btn">编辑</a>
+                    {% endif %}
+                </div>
             </div>
-            <div class="media-body">
-                <div class="front_user_info"></div>
-                <p></p>
-            </div>
-        </div>
+        {% endfor %}
 
-        <hr>
-        <div class="add_comment">
-            <textarea name="comment" id="comment" class="form-control" placeholder="请填写评论"></textarea>
-        </div>
+            <div id="footer"></div>
+            <div class="add_comment">
+                <textarea name="content" id="content" class="form-control" placeholder="请填写评论">{{ current_comment.content }}</textarea>
+                <button class="btn btn-primary" id="comment_btn" data_article_id="{{ article.id }}" data_comment_id="{{ current_comment_id }}">评论</button>
+            </div>
+
+
     </div>
 {% endblock %}

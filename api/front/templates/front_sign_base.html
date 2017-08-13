@@ -28,6 +28,10 @@
 
     {% block detail %}
         <form action="" class="form form-horizontal form_min" method="post">
+            {% csrf_token %}
+            {% if message %}
+                <p class="alert alert-danger">{{ message }}</p>
+            {% endif %}
             <div class="form-group">
                 <div class="input-group">
                     <span class="input-group-addon glyphicon glyphicon-envelope"></span>
