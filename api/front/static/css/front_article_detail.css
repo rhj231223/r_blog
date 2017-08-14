@@ -38,7 +38,7 @@ h2{
 }
 
 .comment{
-    padding:0 14px 10px 14px;
+    padding:0 14px 14px 14px;
     border-bottom:1px solid #f0f0f0;
 }
 
@@ -49,6 +49,7 @@ h2{
     border:none;
     resize:vertical;
 }
+
 
 .front_user_info>span{
     margin-right:8px;
@@ -66,7 +67,7 @@ h2{
 }
 
 .media_body_box>p{
-    margin-top:6px;
+    margin-top:8px;
     font-size:14px;
     margin-bottom: 0;
 }
@@ -86,4 +87,35 @@ h4{
 
 .edit_btn{
     float:right;
+}
+
+.btn_right{
+    float:right;
+    margin-top:10px;
+}
+
+.reply_btn{
+    float:right;
+}
+
+.comment_author{
+    color:#999;
+    font-size:12px;
+}
+
+.comment_content{
+    margin-top: 6px;
+    color:#428bca;
+}
+
+.second_comment{
+    background:#eee;
+    padding:15px;
+}
+
+.second_media_body_box{
+    width:960px;
+}
+.second_media_body_box .front_user_info{
+    margin-bottom: 4px;
 }

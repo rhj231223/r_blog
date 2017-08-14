@@ -10,6 +10,7 @@ urlpatterns=[
     url(r'^regist/$',front_view.front_regist,name='front_regist'),
     url(r'^logout/$',front_view.front_logout,name='front_logout'),
     url(r'^add_comment/$',front_view.add_comment,name='front_add_comment'),
-    url(r'^edit_comment/$',front_view.edit_comment,name='front_edit_comment'),
+    url(r'^edit_comment/(?P<article_id>[\w\-]+)/(?P<comment_id>[\w\-]+)/$',front_view.edit_comment,name='front_edit_comment'),
+    url(r'^reply_comment/(?P<article_id>[\w\-]+)/(?P<comment_id>[\w\-]+)/$',front_view.reply_comment,name='front_reply_comment'),
     url(r'^test/$',front_view.test,name='test'),
 ]

@@ -1,0 +1,24 @@
+{% extends 'front_article_detail.html' %}
+{% load static %}
+
+{% block title %}
+    回复评论
+{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'css/front_article_detail.css' %}">
+    <script src="{% static 'js/front_relpy_comment.js' %}"></script>
+{% endblock %}
+
+{% block reply %}
+    <br>
+    <div>对 <span class="comment_author">{{ current_comment.author.username }}</span> 关于
+        <p class="comment_content">{{ current_comment.content }}</p>
+        的回复
+    </div>
+{% endblock %}
+
+
+{% block comment_btn %}
+    回复
+{% endblock %}

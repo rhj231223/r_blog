@@ -14,7 +14,7 @@ $(function(){
         var url='';
         var msg='';
         if(comment_id){
-            url='/edit_comment/';
+            url=window.location.href;
             msg='评论修改成功!'
         }else{
             url='/add_comment/';
@@ -35,10 +35,10 @@ $(function(){
                 if(data['code']==200){
                     xtalert.alertSuccessToast(msg);
                     setTimeout(function(){
-                        if(url=='/edit_comment/'){
-                            window.location='/article_detail/'+article_id+'/#footer';
+                        if(url=='/add_comment/'){
+                            window.location.reload();
                         }else{
-                            window.location.reload()
+                            window.location='/article_detail/'+article_id+'/#footer';
                         }
                     },1200)
                 }else{

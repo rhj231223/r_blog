@@ -1,0 +1,18 @@
+{% extends 'front_article_detail.html' %}
+
+{% block title %}
+    评论编辑
+{% endblock %}
+
+
+{% block head %}
+    {{ block.super }}
+{% endblock %}
+
+{% block comment_value %}
+    {{ current_comment.content }}
+{% endblock %}
+
+{% block comment_btn %}
+    评论编辑
+{% endblock %}

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+    <meta charset="utf-8"/>
+    <meta name="keywords" content="html,css,javascript" />
+    <meta name="description" content="html,css,javascript" />
+
+    {% include 'common_include.html' %}
+</head>
+<body>
+<form action="{% url 'frontauth_view_test' %}" method="post">
+    {% csrf_token %}
+    <input type="text" name="url" value="{% url 'frontauth_view_test' %}">
+    <button type="submit" class="btn btn-primary">提交</button>
+</form>
+
+	
+	
+
+
+
+	
+</body>
+</html>

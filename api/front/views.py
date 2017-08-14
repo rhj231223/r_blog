@@ -8,7 +8,7 @@ from django.db.models import Count
 from django.http import HttpResponse
 from django.views.decorators.http import require_http_methods
 from forms import FrontLoginForm,FrontRegistForm,\
-    AddComentForm,EditCommentForm
+    AddComentForm,EditCommentForm,ReplyCommentForm
 from front_auth.models import FrontUserModel
 from front_auth.configs import FRONT_SESSION_ID
 from front_auth.decorators import front_login_required
@@ -49,21 +49,20 @@ def article_list(request,page=1,category_id=0):
                        current_category=current_category,current_page=page,total_page=total_page,query=query)
         return render(request,'front_article_list.html',context=context)
 
-def article_detail(request,article_id):
-    article=ArticleModel.objects.filter(id=article_id).first()
+def detail_base(request,article_id):
+    article = ArticleModel.objects.filter(id=article_id).first()
     if not article:
         return HttpResponse(u'该文章没有找到')
     else:
         categorys = CategoryModel.objects.annotate(article_counts=Count('articlemodel')).order_by(
             '-article_counts').all()
-        comments=article.commentmodel_set.all()
-        context=dict(categorys=categorys,article=article,comments=comments)
-        comment_id=request.GET.get('comment_id')
-        if comment_id:
-            current_comment=CommentModel.objects.filter(id=comment_id).first()
-            if current_comment:
-                context.update(current_comment_id=comment_id,current_comment=current_comment)
-        return render(request,'front_article_detail.html',context=context)
+        comments = article.commentmodel_set.all()
+        context = dict(categorys=categorys, article=article, comments=comments)
+        return context
+
+def article_detail(request,article_id):
+    context=detail_base(request,article_id)
+    return render(request,'front_article_detail.html',context)
 
 @require_http_methods(['GET','POST'])
 def front_login(request):
@@ -142,24 +141,66 @@ def add_comment(request):
         return form.get_error_response()
 
 @front_login_required
-@require_http_methods(['POST'])
-def edit_comment(request):
-    form=EditCommentForm(request.POST)
-    if form.is_valid():
-        content=form.cleaned_data.get('content')
-        comment_id=form.cleaned_data.get('comment_id')
-        comment=CommentModel.objects.filter(id=comment_id).first()
-        if comment:
-            comment.content=content
-            comment.save(update_fields=['content'])
-            return xtjson.json_result()
+@require_http_methods(['GET','POST'])
+def edit_comment(request,article_id,comment_id):
+    current_comment = CommentModel.objects.filter(id=comment_id).first()
+    if request.method=='GET':
+        context=detail_base(request,article_id)
+        if current_comment:
+            if current_comment.author.id!=request.front_user.id:
+                context.update(message=u'您的权限不足')
+            else:
+                context=context.update(current_comment_id=comment_id, current_comment=current_comment)
         else:
-            return xtjson.json_params_error(message=u'没有找到该评论!')
+            context.update(message=u'没有找到该评论!')
+        return render(request, 'front_edit_comment.html', context=context)
 
     else:
-        return form.get_error_response()
+        form=EditCommentForm(request.POST)
+        if form.is_valid():
+            content=form.cleaned_data.get('content')
+            comment_id=form.cleaned_data.get('comment_id')
+            comment=CommentModel.objects.filter(id=comment_id).first()
+            if comment:
+                comment.content=content
+                comment.save(update_fields=['content'])
+                return xtjson.json_result()
+            else:
+                return xtjson.json_params_error(message=u'没有找到该评论!')
 
+        else:
+            return form.get_error_response()
 
+@front_login_required
+@require_http_methods(['GET','POST'])
+def reply_comment(request,article_id,comment_id):
+    current_comment=CommentModel.objects.filter(id=comment_id).first()
+    if request.method=='GET':
+        context=detail_base(request,article_id)
+        if current_comment:
+            if current_comment.author.id==request.front_user.id:
+                context.update(message=u'您无需回复自己的评论!')
+            else:
+                context.update(current_comment_id=comment_id,current_comment=current_comment)
+        else:
+            context.update(message=u'没有找到该评论!')
+        return render(request,'front_reply_comment.html',context=context)
+    else:
+        form=ReplyCommentForm(request.POST)
+        if form.is_valid():
+            content=form.cleaned_data.get('content')
+
+            article=ArticleModel.objects.filter(id=article_id).first()
+            author=request.front_user
+
+            comment=CommentModel(content=content)
+            comment.origin_comment=current_comment
+            comment.article=article
+            comment.author=author
+            comment.save()
+            return xtjson.json_result()
+        else:
+            return form.get_error_response()
 def front_logout(request):
     request.session.pop(FRONT_SESSION_ID,None)
     return redirect(reverse('front_login'))

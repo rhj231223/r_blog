@@ -45,20 +45,59 @@
                         <span>{{ comment.author.username }}</span>
                         <span>{{ comment.create_time|date:'Y年m月d日 H:i' }}</span>
                     </div>
+                    {% if comment.origin_comment %}
+                        <div class="media second_comment">
+                            <div class="media-left second_media_left_box">
+                                {% if comment.origin_comment.author.avatar %}
+                                    <img src="{{ comment.origin_comment.author.avatar }}" alt="" class="media-object img-circle avatar_style">
+                                {% else %}
+                                    <img src="{% static 'images/2.jpg' %}" alt="" class="media-object img-circle avatar_style">
+                                {% endif %}
+                            </div>
+                            <div class="media-body second_media_body_box">
+                                <div class="front_user_info">
+                                    <span>{{ comment.origin_comment.author.username }}</span>
+                                    <span>{{ comment.origin_comment.create_time|date:'Y年m月d日 H:i' }}</span>
+                                </div>
+                                <p>{{ comment.origin_comment.content }}</p>
+                                {% if not front_user %}
+                                    <a class="btn btn-info btn-xs reply_btn" href="{% url 'front_login' %}">回复</a>
+                                {% elif comment.origin_comment.author.id != front_user.id %}
+                                    <a href="{% url 'front_reply_comment' article_id=article.id comment_id=comment.origin_comment.id %}#footer" class="btn btn-info btn-xs reply_btn">回复</a>
+                                {% else %}
+                                    <a href="{% url 'front_edit_comment' article_id=article.id comment_id=comment.origin_comment.id%}#footer" class="btn btn-warning btn-xs edit_btn">编辑</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
                     <p>{{ comment.content }}</p>
                     {% if not front_user %}
-                        <a class="btn btn-warning btn-sm" href="{% url 'front_login' %}"></a>
-                    {% elif comment.author.id == front_user.id %}
-                        <a href="{% url 'front_article_detail' article_id=article.id %}?comment_id={{ comment.id }}#footer" class="btn btn-warning btn-xs edit_btn">编辑</a>
+                        <a class="btn btn-info btn-xs reply_btn" href="{% url 'front_login' %}">回复</a>
+                    {% elif comment.author.id != front_user.id %}
+                        <a href="{% url 'front_reply_comment' article_id=article.id comment_id=comment.id %}#footer" class="btn btn-info btn-xs reply_btn">回复</a>
+                    {% else %}
+                        <a href="{% url 'front_edit_comment' article_id=article.id comment_id=comment.id%}#footer" class="btn btn-warning btn-xs edit_btn">编辑</a>
                     {% endif %}
                 </div>
             </div>
         {% endfor %}
 
             <div id="footer"></div>
+            {% if message %}
+                <p class="alert alert-danger">{{ message }}</p>
+            {% endif %}
+            
+            {% block reply %}
+            
+            {% endblock %}
+
             <div class="add_comment">
-                <textarea name="content" id="content" class="form-control" placeholder="请填写评论">{{ current_comment.content }}</textarea>
-                <button class="btn btn-primary" id="comment_btn" data_article_id="{{ article.id }}" data_comment_id="{{ current_comment_id }}">评论</button>
+                <textarea name="content" id="content" class="form-control" placeholder="请填写评论">{% block comment_value %}{% endblock %}</textarea>
+                {% if not front_user %}
+                    <a class="btn btn-primary btn_right" href="{% url 'front_login' %}">评论</a>
+                {% else %}
+                    <button class="btn btn-primary" id="comment_btn" data_article_id="{{ article.id }}" data_comment_id="{{ current_comment_id }}">{% block comment_btn %}评论{% endblock %}</button>
+                {% endif %}
             </div>
 
 

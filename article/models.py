@@ -33,10 +33,11 @@ class TopModel(models.Model):
     create_time=models.DateTimeField(auto_now_add=True)
 
 class CommentModel(models.Model):
+    id=models.UUIDField(default=uuid4,primary_key=True)
     content=models.CharField(max_length=200)
     create_time=models.DateTimeField(auto_now_add=True)
     update_time=models.DateTimeField(auto_now=True)
 
     article=models.ForeignKey('ArticleModel')
     author=models.ForeignKey(FrontUserModel)
-
+    origin_comment=models.ForeignKey('CommentModel',null=True)

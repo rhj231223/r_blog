@@ -17,4 +17,7 @@ class AddComentForm(BaseForm):
     article_id=forms.UUIDField()
 
 class EditCommentForm(AddComentForm):
-    comment_id=forms.IntegerField()
+    comment_id=forms.CharField(max_length=100)
+
+class ReplyCommentForm(BaseForm):
+    content=forms.CharField(max_length=200)
